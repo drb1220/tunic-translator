@@ -1,5 +1,6 @@
 import eng_to_ipa as ipa
 from PIL import Image
+import tkinter as tk
 
 vowels = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "ʊ", "u", "ɪ", "ə", "i", "e", "ɔ", "æ"]
 consonants = ["b", "ʧ", "d", "f", "g", "h", "ʤ", "k", "l", "m", "n", "ŋ", "p", "r", "s", "ʃ", "t", "θ", "ð", "v", "w", "y", "z", "ʒ"]
@@ -33,8 +34,16 @@ def separate_words(phrase: str) -> list:
 def convert_to_ipa(phrase: list) -> list:
     result = []
     for word in phrase:
-        new_word = ipa.convert(word)
+        new_word = None
+        if word[0] == "*":
+            new_word = word
+        else:
+            new_word = ipa.convert(word)
         new_word = new_word.replace("ˈ", "")
+        new_word = new_word.replace("ˌ", "")
+        new_word = new_word.replace(",", "")
+        new_word = new_word.replace(".", "")
+        new_word = new_word.replace("*", "")
         new_word = new_word.replace("ɑr", "1")
         new_word = new_word.replace("eɪ", "2")
         new_word = new_word.replace("ɪr", "3")
@@ -46,6 +55,8 @@ def convert_to_ipa(phrase: list) -> list:
         new_word = new_word.replace("aʊ", "9")
         new_word = new_word.replace("ʊr", "0")
         new_word = new_word.replace("ɛ", "e")
+        new_word = new_word.replace("ɑ", "ɔ")
+        print(new_word)
         result.append(new_word)
     return result
 
@@ -139,9 +150,18 @@ def translate(phrase: str):
             result = word_result
         else:
             result = combine_words(result, word_result)
-    #result = add_bg(result)
+    result = add_bg(result)
     return result
 
+def translate_input():
+    translation = translate(entry.get())
+    translation.show()
     
-t = translate("Our dog is fat")
-t.show()
+window = tk.Tk()
+text = tk.Label(text="Enter text to be translated. Use * to denote a word already in IPA.")
+text.pack()
+entry = tk.Entry(width=50)
+entry.pack()
+button = tk.Button(window, text="Translate", command= translate_input)
+button.pack()
+window.mainloop()
